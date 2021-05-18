@@ -2,6 +2,7 @@ import os.path as osp
 
 import mmcv
 import numpy as np
+from sklearn.preprocessing import minmax_scale
 
 from ..builder import PIPELINES
 
@@ -32,7 +33,8 @@ class LoadImageFromFile(object):
                  to_float32=False,
                  color_type='color',
                  file_client_args=dict(backend='disk'),
-                 imdecode_backend='cv2'):
+                 imdecode_backend='cv2',
+                 load_npz=False):
         self.to_float32 = to_float32
         self.color_type = color_type
         self.file_client_args = file_client_args.copy()
@@ -57,11 +59,26 @@ class LoadImageFromFile(object):
                                 results['img_info']['filename'])
         else:
             filename = results['img_info']['filename']
-        img_bytes = self.file_client.get(filename)
-        img = mmcv.imfrombytes(
-            img_bytes, flag=self.color_type, backend=self.imdecode_backend)
-        if self.to_float32:
-            img = img.astype(np.float32)
+
+        if "npz" in filename:
+            with np.load(filename) as data:
+                if len(data) != 1 or "arr_0" not in data:
+                    raise Exception("More than 1 array in the npz or name invalid")
+                arr = data['arr_0'].astype(np.float32)
+
+            if arr.shape[0] != arr.shape[1]:
+                print("ERROR", filename)
+                
+            # data = minmax_scale(np.clip(arr, 0, 99999), feature_range=(0, 1))
+            data = np.clip(arr, 0, 99999)
+            # return np.repeat(data[:, :, np.newaxis], 3, axis=2)
+            return data
+        else:
+            img_bytes = self.file_client.get(filename)
+            img = mmcv.imfrombytes(
+                img_bytes, flag=self.color_type, backend=self.imdecode_backend)
+            if self.to_float32:
+                img = img.astype(np.float32)
 
         results['filename'] = filename
         results['ori_filename'] = results['img_info']['filename']
