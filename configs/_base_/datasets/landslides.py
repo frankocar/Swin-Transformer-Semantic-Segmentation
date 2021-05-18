@@ -1,5 +1,5 @@
 # dataset settings
-dataset_type = 'Landslides'
+dataset_type = 'LandslidesDataset'
 data_root = 'data/LandlidesSeg/Landslides1024'
 img_norm_cfg = dict(
     mean=[184.66, 184.66, 184.66], std=[33.18, 33.18, 33.18], to_rgb=False)
