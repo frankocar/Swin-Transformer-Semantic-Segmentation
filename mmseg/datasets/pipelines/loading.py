@@ -70,9 +70,8 @@ class LoadImageFromFile(object):
                 print("ERROR", filename)
                 
             # data = minmax_scale(np.clip(arr, 0, 99999), feature_range=(0, 1))
-            data = np.clip(arr, 0, 99999)
+            img = np.clip(arr, 0, 99999)
             # return np.repeat(data[:, :, np.newaxis], 3, axis=2)
-            return data
         else:
             img_bytes = self.file_client.get(filename)
             img = mmcv.imfrombytes(

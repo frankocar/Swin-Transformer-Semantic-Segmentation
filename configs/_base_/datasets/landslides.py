@@ -1,6 +1,6 @@
 # dataset settings
 dataset_type = 'LandslidesDataset'
-data_root = 'data/LandlidesSeg/Landslides1024'
+data_root = 'data/LandslidesSeg/Landslides1024'
 img_norm_cfg = dict(
     mean=[184.66, 184.66, 184.66], std=[33.18, 33.18, 33.18], to_rgb=False)
 crop_size = (512, 512)
